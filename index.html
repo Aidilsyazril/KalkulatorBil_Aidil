@@ -31,14 +31,7 @@
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
                             <label>ALAMAT POS</label>
-                            <textarea id="premiseAddress" class="form-textarea" rows="8">REKTOR UNIVERSITI TNB (UNITEN)-
-PENTADBIRAN-
-BANGUNAN PERPUSTAKAAN
-UNITEN, PERKHIDMATAN PENGURUSAN HARTA
-KM 7
-JLN KAJANG - PUCHONG
-43009 KAJANG
-SELANGOR</textarea>
+                            <textarea id="premiseAddress" class="form-textarea" rows="8" placeholder="Masukkan alamat premis anda"></textarea>
                         </div>
                     </div>
                     
@@ -46,7 +39,7 @@ SELANGOR</textarea>
                         <i class="fas fa-calendar-alt"></i>
                         <div>
                             <label>TARIKH BIL</label>
-                            <input type="date" id="billDate" value="2025-08-05" class="form-input">
+                            <input type="date" id="billDate" class="form-input" placeholder="mm/dd/yyyy">
                         </div>
                     </div>
                     
@@ -55,10 +48,10 @@ SELANGOR</textarea>
                         <div>
                             <label>TEMPOH BIL</label>
                             <div class="period-details">
-                                <input type="date" id="periodStart" value="2025-07-01" class="form-input-small">
+                                <input type="date" id="periodStart" class="form-input-small" placeholder="mm/dd/yyyy">
                                 <span>-</span>
-                                <input type="date" id="periodEnd" value="2025-07-31" class="form-input-small">
-                                <div class="period-duration" id="periodDuration">(31 Hari)</div>
+                                <input type="date" id="periodEnd" class="form-input-small" placeholder="mm/dd/yyyy">
+                                <div class="period-duration" id="periodDuration">(0 Hari)</div>
                             </div>
                         </div>
                     </div>
@@ -68,24 +61,24 @@ SELANGOR</textarea>
                     <div class="info-item">
                         <i class="fas fa-user"></i>
                         <div>
-                            <label>NO. AKAUN</label>
-                            <input type="text" id="accountNumber" value="220131642806" class="form-input">
+                            <label>NAMA PENYEWA</label>
+                            <input type="text" id="tenantName" placeholder="Masukkan nama penyewa" class="form-input">
                         </div>
                     </div>
                     
                     <div class="info-item">
                         <i class="fas fa-file-invoice"></i>
                         <div>
-                            <label>NO. INVOIS</label>
-                            <input type="text" id="invoiceNumber" value="000109298660" class="form-input">
+                            <label>NO. AKAUN</label>
+                            <input type="text" id="accountNumber" placeholder="Masukkan nombor akaun" class="form-input">
                         </div>
                     </div>
                     
                     <div class="info-item">
                         <i class="fas fa-book"></i>
                         <div>
-                            <label>JENIS BACAAN</label>
-                            <input type="text" id="readingType" value="Bacaan Sebenar" class="form-input">
+                            <label>NO. METER</label>
+                            <input type="text" id="meterNumber" placeholder="Masukkan nombor meter" class="form-input">
                         </div>
                     </div>
                     
@@ -102,7 +95,7 @@ SELANGOR</textarea>
                         <i class="fas fa-credit-card"></i>
                         <div>
                             <label>BAYARAN BAGI TEMPOH</label>
-                            <input type="text" id="paymentPeriod" value="01.07.2025 - 31.07.2025" class="form-input">
+                            <input type="text" id="paymentPeriod" placeholder="Masukkan tempoh bayaran" class="form-input">
                         </div>
                     </div>
                 </div>
@@ -146,7 +139,7 @@ SELANGOR</textarea>
                     </div>
                     <div class="print-info-row">
                         <div class="print-info-item">
-                            <strong>NO. AKAUN:</strong>
+                            <strong>NAMA PENYEWA:</strong>
                             <span id="printAccountNumber"></span>
                         </div>
                         <div class="print-info-item">
@@ -281,9 +274,6 @@ SELANGOR</textarea>
                 <button id="calculateBill" class="btn btn-primary">
                     <i class="fas fa-calculator"></i> Kira Bil
                 </button>
-                <button id="saveBill" class="btn btn-success">
-                    <i class="fas fa-save"></i> Simpan Bil
-                </button>
                 <button id="printBill" class="btn btn-info">
                     <i class="fas fa-print"></i> Cetak Bil
                 </button>
@@ -310,12 +300,17 @@ SELANGOR</textarea>
                     const startDate = new Date(startElement.value);
                     const endDate = new Date(endElement.value);
                     
-                    if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                    // Check if both dates are selected and valid
+                    if (startElement.value && endElement.value && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
                         const diffTime = Math.abs(endDate - startDate);
                         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
                         
                         durationElement.textContent = `(${diffDays} Hari)`;
                         console.log(`Updated duration to: ${diffDays} days`);
+                    } else {
+                        // No dates selected or invalid dates
+                        durationElement.textContent = '(0 Hari)';
+                        console.log('Dates not selected or invalid, duration set to 0 days');
                     }
                 }
             }
@@ -333,26 +328,19 @@ SELANGOR</textarea>
                     calculatePeriodDays();
                     updatePrintPeriod();
                 });
+                // Initialize with 0 days since no dates are selected yet
                 calculatePeriodDays();
                 updatePrintPeriod(); // Initialize print period on page load
             }
             
             // Button functionality
             const calculateBtn = document.getElementById('calculateBill');
-            const saveBtn = document.getElementById('saveBill');
             const printBtn = document.getElementById('printBill');
             const clearBtn = document.getElementById('clearBill');
             
             // Calculate button is handled by ElectricityBillCalculator class
             
-            if (saveBtn) {
-                saveBtn.addEventListener('click', function() {
-                    console.log('Save button clicked');
-                    alert('Bil berjaya disimpan!');
-                });
-            }
-            
-            // Print button handled by ElectricityBillCalculator class
+
             
             if (clearBtn) {
                 clearBtn.addEventListener('click', function() {
@@ -362,6 +350,8 @@ SELANGOR</textarea>
                     }
                 });
             }
+            
+
             
             // Removed duplicate calculateBill function - using ElectricityBillCalculator class instead
             
@@ -410,16 +400,22 @@ SELANGOR</textarea>
                 const startDate = document.getElementById('periodStart').value;
                 const endDate = document.getElementById('periodEnd').value;
                 const durationText = document.getElementById('periodDuration').textContent;
-                const accountNumber = document.getElementById('accountNumber').value;
+                const tenantName = document.getElementById('tenantName').value;
                 
                 // Update the print period display - target the correct element
                 const printPeriodElement = document.getElementById('paymentPeriod');
-                if (printPeriodElement && startDate && endDate) {
-                    // Format dates for display (DD.MM.YYYY format to match original)
-                    const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
-                    const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
-                    printPeriodElement.textContent = `NO. AKAUN: ${accountNumber}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
-                    console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
+                if (printPeriodElement) {
+                    if (startDate && endDate) {
+                        // Format dates for display (DD.MM.YYYY format to match user requirement)
+                        const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                        const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                        printPeriodElement.textContent = `NAMA PENYEWA: ${tenantName || 'Belum diisi'}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
+                        console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
+                    } else {
+                        // No dates selected yet
+                        printPeriodElement.textContent = `NAMA PENYEWA: ${tenantName || 'Belum diisi'}\nTEMPOH BIL: Belum dipilih`;
+                        console.log('Print period updated: No dates selected yet');
+                    }
                 }
             }
             
