@@ -34,18 +34,20 @@ class ElectricityBillCalculator {
             const startDate = new Date(startDateElement.value);
             const endDate = new Date(endDateElement.value);
             
-            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                console.log('Invalid dates');
-                return;
+            // Check if both dates are selected and valid
+            if (startDateElement.value && endDateElement.value && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                // Calculate the difference in time
+                const diffTime = Math.abs(endDate - startDate);
+                // Convert to days and add 1 to include both start and end dates
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
+                durationElement.textContent = `(${diffDays} Hari)`;
+                console.log(`Calculated days: ${diffDays} for period ${startDateElement.value} to ${endDateElement.value}`);
+            } else {
+                // No dates selected or invalid dates
+                durationElement.textContent = '(0 Hari)';
+                console.log('Dates not selected or invalid, duration set to 0 days');
             }
-            
-            // Calculate the difference in time
-            const diffTime = Math.abs(endDate - startDate);
-            // Convert to days and add 1 to include both start and end dates
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            
-            durationElement.textContent = `(${diffDays} Hari)`;
-            console.log(`Calculated days: ${diffDays} for period ${startDateElement.value} to ${endDateElement.value}`);
         };
 
         // Add event listeners with error checking
@@ -65,7 +67,7 @@ class ElectricityBillCalculator {
                 this.calculateBill();
             });
             
-            // Initial calculation
+            // Initialize with 0 days since no dates are selected yet
             calculateDays();
         } else {
             console.log('Date input elements not found');
@@ -87,7 +89,6 @@ class ElectricityBillCalculator {
 
         // Manual buttons
         document.getElementById('calculateBill').addEventListener('click', () => this.calculateBill());
-        document.getElementById('saveBill').addEventListener('click', () => this.saveBill());
         document.getElementById('printBill').addEventListener('click', () => this.printBill());
         
         const clearButton = document.getElementById('clearBill');
@@ -197,31 +198,7 @@ class ElectricityBillCalculator {
         setTimeout(() => table.classList.remove('calculating'), 300);
     }
 
-    saveBill() {
-        const billData = {
-            accountNumber: document.getElementById('accountNumber').value,
-            premiseAddress: document.getElementById('premiseAddress').value,
-            lastPaymentAmount: document.getElementById('lastPaymentAmount').value,
-            lastPaymentDate: document.getElementById('lastPaymentDate').value,
-            periodStart: document.getElementById('periodStart').value,
-            periodEnd: document.getElementById('periodEnd').value,
-            tenantName: document.getElementById('tenantName').value,
-            meterNumber: document.getElementById('meterNumber').value,
-            tariffType: document.getElementById('tariffType').value,
-            peakUsage: document.getElementById('peakUsage').value,
-            offPeakUsage: document.getElementById('offPeakUsage').value,
-            totalUsage: document.getElementById('totalUsage').value,
-            maxDemand: document.getElementById('maxDemand').value,
-            grandTotal: document.getElementById('grandTotal').textContent,
-            timestamp: new Date().toISOString()
-        };
 
-        let savedBills = JSON.parse(localStorage.getItem('electricityBills') || '[]');
-        savedBills.push(billData);
-        localStorage.setItem('electricityBills', JSON.stringify(savedBills));
-        
-        alert('Bil berjaya disimpan!');
-    }
 
     updatePrintPeriod() {
         const startDate = document.getElementById('periodStart').value;
@@ -231,12 +208,18 @@ class ElectricityBillCalculator {
         
         // Update the print period display - target the correct element
         const printPeriodElement = document.getElementById('paymentPeriod');
-        if (printPeriodElement && startDate && endDate) {
-            // Format dates for display (DD.MM.YYYY format to match original)
-            const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
-            const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
-            printPeriodElement.textContent = `NO. AKAUN: ${accountNumber}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
-            console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
+        if (printPeriodElement) {
+            if (startDate && endDate) {
+                // Format dates for display (DD.MM.YYYY format to match user requirement)
+                const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                printPeriodElement.textContent = `NO. AKAUN: ${accountNumber || 'Belum diisi'}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
+                console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
+            } else {
+                // No dates selected yet
+                printPeriodElement.textContent = `NO. AKAUN: ${accountNumber || 'Belum diisi'}\nTEMPOH BIL: Belum dipilih`;
+                console.log('Print period updated: No dates selected yet');
+            }
         }
     }
 
