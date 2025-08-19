@@ -856,3 +856,15 @@ body {
 .calculating {
     animation: calculate 0.3s ease-in-out;
 }
+
+footer {
+    text-align: center; /* Centers the text */
+    padding: 20px; /* Adds some space around the text */
+    background-color: #f8f9fa; /* Light gray background, change as needed */
+    color: #333; /* Dark gray text color, change as needed */
+    font-size: 14px; /* Adjust the font size */
+    border-top: 1px solid #e9ecef; /* Optional: adds a subtle border at the top */
+    position: fixed; /* Optional: sticks the footer to the bottom of the page */
+    bottom: 0; /* Optional: aligns the footer to the bottom */
+    width: 100%; /* Ensures the footer spans the full width */
+}
