@@ -1,0 +1,858 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Header Styles - Matching Electricity Bill */
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px 15px 0 0;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.bill-title {
+    flex: 1;
+}
+
+.bill-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    padding: 10px 20px;
+    border-radius: 25px;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.logos-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-logo-large {
+    height: 120px;
+    width: auto;
+    max-width: 300px;
+    object-fit: contain;
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.user-logo-large:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Print Styles - Clean Single Page Bill */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    body {
+        background: white !important;
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        line-height: 1.3;
+        color: black !important;
+        margin: 0;
+        padding: 15px;
+    }
+    
+    .container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: white !important;
+        max-width: none !important;
+        margin: 0 !important;
+    }
+    
+    /* Hide all sections except what we need for print */
+    .bill-info-grid,
+    .usage-input-section,
+    .action-section {
+        display: none !important;
+    }
+    
+    /* Show only header and charges section */
+    .header {
+        background: white !important;
+        color: black !important;
+        border: none !important;
+        border-radius: 0;
+        padding: 5px 0;
+        margin-bottom: 8px;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .bill-title {
+        display: none !important;
+    }
+    
+    .user-logo-large {
+        height: 90px !important;
+        max-width: 280px !important;
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: block !important;
+        margin: 0 auto !important;
+    }
+    
+    .charges-section {
+        background: white !important;
+        border: 1px solid #ccc;
+        padding: 4px;
+        margin-bottom: 0;
+        page-break-inside: avoid;
+        font-size: 12px !important;
+    }
+    
+    .charges-section h2 {
+        display: none !important;
+    }
+    
+    .charges-table table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 13px !important;
+        margin: 0;
+        line-height: 1.2 !important;
+    }
+    
+    .charges-table th {
+        background: #e6f3ff !important;
+        border: 1px solid #333 !important;
+        padding: 5px 8px !important;
+        text-align: center !important;
+        color: black !important;
+        font-weight: bold !important;
+    }
+    
+    .charges-table td {
+        border: 1px solid #333 !important;
+        padding: 4px 8px !important;
+        text-align: right !important;
+        color: black !important;
+    }
+    
+    .charges-table td:first-child {
+        text-align: left !important;
+    }
+    
+    .total-row {
+        background: #f0f8ff !important;
+        font-weight: bold !important;
+    }
+    
+    .total-row td {
+        font-weight: bold !important;
+        border-top: 2px solid #333 !important;
+    }
+    
+    /* Style dynamic bill period display */
+    .bill-period-display {
+        font-size: 11px;
+        margin-bottom: 8px;
+        padding: 5px 8px;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        line-height: 1.3;
+        white-space: pre-line;
+    }
+    
+    /* Print-only info sections */
+    .print-info-sections {
+        margin-bottom: 10px;
+        padding: 6px;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-size: 11px;
+        page-break-inside: avoid;
+    }
+    
+    .print-info-row {
+        display: flex;
+        margin-bottom: 4px;
+        gap: 15px;
+    }
+    
+    .print-info-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .print-info-item {
+        flex: 1;
+        line-height: 1.2;
+    }
+    
+    .print-info-item strong {
+        display: block;
+        margin-bottom: 2px;
+        font-weight: bold;
+        color: #333;
+        font-size: 10px;
+    }
+    
+    #printPremiseAddress {
+        white-space: pre-line;
+        font-size: 10px;
+        line-height: 1.2;
+        max-height: 60px;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+}
+
+/* Print-only bill layout */
+.print-only {
+    display: none;
+}
+
+@media print {
+    .print-only {
+        display: block !important;
+    }
+}
+
+/* Additional Responsive Design */
+@media (max-width: 768px) {
+    .bill-info-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .header-top {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .bill-title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .logos-section {
+        justify-content: center;
+    }
+    
+    .user-logo-large {
+        height: 80px;
+        max-width: 200px;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .address-item {
+        grid-row: span 1;
+        min-height: auto;
+    }
+    
+    .period-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+.bill-container {
+    padding: 30px;
+    background: #f8fafc;
+}
+
+/* Bill Info Grid */
+.bill-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.left-info, .right-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background: #f1f5f9;
+    border-left-color: #1e40af;
+    transform: translateX(2px);
+}
+
+.address-item {
+    grid-row: span 2;
+    min-height: 200px;
+}
+
+.address-item .form-textarea {
+    min-height: 140px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.info-item i {
+    color: #3b82f6;
+    font-size: 1.2rem;
+    margin-top: 2px;
+    width: 20px;
+    text-align: center;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.period-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.period-duration {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Bill Total Section */
+.bill-total-section {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.total-amount {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.amount-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.amount-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pay-btn {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pay-btn:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.payment-due {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.due-date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.bill-breakdown {
+    padding: 30px;
+}
+
+.breakdown-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 3px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.breakdown-row:hover {
+    background: #f1f5f9;
+    border-left-color: #3b82f6;
+}
+
+.breakdown-row span:first-child {
+    color: #374151;
+    font-weight: 500;
+}
+
+.breakdown-row span:last-child {
+    color: #1f2937;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.account-left, .account-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.account-number label, .premise-address label, 
+.last-payment label, .billing-period label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.payment-details, .period-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-row, .period-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-row span, .period-row span {
+    font-weight: 500;
+    min-width: 60px;
+}
+
+/* Form Elements */
+.form-input, .form-input-small, .form-textarea {
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+    width: 100%;
+}
+
+/* AFA Select Dropdown */
+.afa-select {
+    padding: 4px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.afa-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:focus, .form-input-small:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input-small {
+    width: 150px;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.period-duration {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+    background: #f0f0f0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* Tenant Section */
+.tenant-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.tenant-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.tenant-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.tenant-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.tenant-item label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    text-align: center;
+    width: 100%;
+}
+
+/* Usage Section */
+.usage-input-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.usage-input-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.usage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.usage-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.usage-item label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    text-align: center;
+    width: 100%;
+}
+
+/* Charges Section */
+.charges-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.charges-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.charges-table {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.charges-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.charges-table th {
+    background: #2c3e50;
+    color: white;
+    padding: 12px 15px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.charges-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.95rem;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.section-header {
+    background: #5ea2e6 !important;
+    color: rgb(0, 0, 0) !important;
+    font-weight: 600;
+    text-align: center;
+}
+
+.section-header:hover {
+    background: #2c3e50 !important;
+}
+
+.total-row {
+    background: #e8f5e8 !important;
+    font-weight: 600;
+    border-top: 2px solid #28a745;
+}
+
+.total-row:hover {
+    background: #d4edda !important;
+}
+
+/* Action Buttons */
+.action-section {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+    min-width: 140px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+    
+    .header {
+        padding: 20px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .header-text {
+        text-align: center;
+    }
+    
+    .account-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .tenant-grid, .usage-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 0.3in;
+    }
+    
+    body {
+        background: white !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    
+    .action-section {
+        display: none !important;
+    }
+}
+
+/* Animations */
+@keyframes calculate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.calculating {
+    animation: calculate 0.3s ease-in-out;
+}

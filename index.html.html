@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bil Elektrik</title>
+    <link rel="stylesheet" href="deepseek_css_20250813_904c07.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="header-top">
+                    <div class="bill-title">
+                        <h1>Bil Elektrik Anda</h1>
+                    </div>
+                    <div class="logos-section">
+                        <img src="logo.png" alt="Your Logo" class="user-logo-large">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="bill-container">
+            <!-- Bill Information Section -->
+            <div class="bill-info-grid">
+                <div class="left-info">
+                    <div class="info-item address-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <label>ALAMAT POS</label>
+                            <textarea id="premiseAddress" class="form-textarea" rows="8">REKTOR UNIVERSITI TNB (UNITEN)-
+PENTADBIRAN-
+BANGUNAN PERPUSTAKAAN
+UNITEN, PERKHIDMATAN PENGURUSAN HARTA
+KM 7
+JLN KAJANG - PUCHONG
+43009 KAJANG
+SELANGOR</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div>
+                            <label>TARIKH BIL</label>
+                            <input type="date" id="billDate" value="2025-08-05" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <label>TEMPOH BIL</label>
+                            <div class="period-details">
+                                <input type="date" id="periodStart" value="2025-07-01" class="form-input-small">
+                                <span>-</span>
+                                <input type="date" id="periodEnd" value="2025-07-31" class="form-input-small">
+                                <div class="period-duration" id="periodDuration">(31 Hari)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-info">
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <div>
+                            <label>NO. AKAUN</label>
+                            <input type="text" id="accountNumber" value="220131642806" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-file-invoice"></i>
+                        <div>
+                            <label>NO. INVOIS</label>
+                            <input type="text" id="invoiceNumber" value="000109298660" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-book"></i>
+                        <div>
+                            <label>JENIS BACAAN</label>
+                            <input type="text" id="readingType" value="Bacaan Sebenar" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-home"></i>
+                        <div>
+                            <label>TARIF</label>
+                            <div class="fixed-text">Bukan Domestik ToU Voltan Sederhana Diskaun</div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="info-item">
+                        <i class="fas fa-credit-card"></i>
+                        <div>
+                            <label>BAYARAN BAGI TEMPOH</label>
+                            <input type="text" id="paymentPeriod" value="01.07.2025 - 31.07.2025" class="form-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Usage Input Section -->
+            <div class="usage-input-section">
+                <h2>Maklumat Penggunaan</h2>
+                <div class="usage-grid">
+                    <div class="usage-item">
+                        <label for="peakUsage">Penggunaan Puncak (kWh):</label>
+                        <input type="number" id="peakUsage" placeholder="Masukkan penggunaan puncak" class="form-input">
+                    </div>
+                    <div class="usage-item">
+                        <label for="offPeakUsage">Penggunaan Luar Puncak (kWh):</label>
+                        <input type="number" id="offPeakUsage" placeholder="Masukkan penggunaan luar puncak" class="form-input">
+                    </div>
+                    <div class="usage-item">
+                        <label for="totalUsage">Jumlah Penggunaan Anda (kWh):</label>
+                        <input type="number" id="totalUsage" placeholder="Masukkan jumlah penggunaan" class="form-input">
+                    </div>
+                    <div class="usage-item">
+                        <label for="maxDemand">Permintaan Maksima (kW):</label>
+                        <input type="number" id="maxDemand" placeholder="Masukkan permintaan maksima" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="charges-section">
+                <div id="paymentPeriod" class="bill-period-display"></div>
+                
+                <!-- Print-only sections for Alamat Premis, No Akaun, Tempoh Bil -->
+                <div class="print-info-sections print-only">
+                    <div class="print-info-row">
+                        <div class="print-info-item">
+                            <strong>ALAMAT PREMIS:</strong>
+                            <div id="printPremiseAddress"></div>
+                        </div>
+                    </div>
+                    <div class="print-info-row">
+                        <div class="print-info-item">
+                            <strong>NO. AKAUN:</strong>
+                            <span id="printAccountNumber"></span>
+                        </div>
+                        <div class="print-info-item">
+                            <strong>TEMPOH BIL:</strong>
+                            <span id="printBillingPeriod"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2>Pecahan Caj</h2>
+                <div class="charges-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jenis Caj</th>
+                                <th>Tanpa ST</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="section-header">
+                                <td colspan="3">Ringkasan Penggunaan</td>
+                            </tr>
+                            <tr>
+                                <td>Penggunaan Puncak (kWh)</td>
+                                <td id="peakUsageDisplay">0.00</td>
+                                <td id="peakUsageTotal">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Penggunaan Luar Puncak (kWh)</td>
+                                <td id="offPeakUsageDisplay">0.00</td>
+                                <td id="offPeakUsageTotal">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Jumlah Penggunaan Anda (kWh)</td>
+                                <td id="totalUsageDisplay">0.00</td>
+                                <td id="totalUsageTotal">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Permintaan Maksima (kW)</td>
+                                <td id="maxDemandDisplay">0.00</td>
+                                <td id="maxDemandTotal">0.00</td>
+                            </tr>
+
+                            <tr class="section-header">
+                                <td colspan="3">Caj Penjanaan</td>
+                            </tr>
+                            <tr>
+                                <td>Tenaga (Puncak) @ RM0.3132/kWh</td>
+                                <td id="peakEnergyRate">0.3132</td>
+                                <td id="peakEnergyAmount">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Tenaga (Luar Puncak) @ RM0.2723/kWh</td>
+                                <td id="offPeakEnergyRate">0.2723</td>
+                                <td id="offPeakEnergyAmount">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>AFA @ RM<span id="afaRateDisplay">0.00</span>/kWh</td>
+                                <td>
+                                    <select id="afaRate" class="afa-select">
+                                        <option value="-0.03">-0.03</option>
+                                        <option value="-0.02">-0.02</option>
+                                        <option value="-0.01">-0.01</option>
+                                        <option value="0.00" selected>0.00</option>
+                                        <option value="0.01">0.01</option>
+                                        <option value="0.02">0.02</option>
+                                        <option value="0.03">0.03</option>
+                                    </select>
+                                </td>
+                                <td id="afaAmount">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Kapasiti @ RM30.19/kW</td>
+                                <td id="capacityRate">30.19</td>
+                                <td id="capacityAmount">0.00</td>
+                            </tr>
+
+                            <tr class="section-header">
+                                <td colspan="3">Caj Rangkaian</td>
+                            </tr>
+                            <tr>
+                                <td>Caj Rangkaian @ RM66.87/kW</td>
+                                <td id="networkRate">66.87</td>
+                                <td id="networkAmount">0.00</td>
+                            </tr>
+
+                            <tr class="section-header">
+                                <td colspan="3">Caj Peruncitan</td>
+                            </tr>
+                            <tr>
+                                <td>Caj Peruncitan (RM)</td>
+                                <td>200.00</td>
+                                <td>200.00</td>
+                            </tr>
+
+                            <tr class="section-header">
+                                <td colspan="3">Caj-caj Lain</td>
+                            </tr>
+                            <tr>
+                                <td>Rebat (10%)</td>
+                                <td id="rebateRate">-10%</td>
+                                <td id="rebateAmount">-0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Caj Penggunaan Bulan Semasa (RM)</td>
+                                <td id="currentMonthCharge">0.00</td>
+                                <td id="currentMonthChargeTotal">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>KWTBB (1.6%)</td>
+                                <td id="kwtbbRate">1.6%</td>
+                                <td id="kwtbbAmount">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Pelarasan Penggenapan</td>
+                                <td id="roundingAdjustmentRate">-</td>
+                                <td id="roundingAdjustmentAmount">0.00</td>
+                            </tr>
+
+                            <tr class="total-row">
+                                <td><strong>JUMLAH KESELURUHAN (RM)</strong></td>
+                                <td></td>
+                                <td id="grandTotal"><strong>0.00</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <button id="calculateBill" class="btn btn-primary">
+                    <i class="fas fa-calculator"></i> Kira Bil
+                </button>
+                <button id="saveBill" class="btn btn-success">
+                    <i class="fas fa-save"></i> Simpan Bil
+                </button>
+                <button id="printBill" class="btn btn-info">
+                    <i class="fas fa-print"></i> Cetak Bil
+                </button>
+                <button id="clearBill" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Kosongkan
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="deepseek_javascript_20250813_c365bf.js"></script>
+    
+    <!-- Additional script for date calculation and button functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up date calculation and button functionality');
+            
+            function calculatePeriodDays() {
+                const startElement = document.getElementById('periodStart');
+                const endElement = document.getElementById('periodEnd');
+                const durationElement = document.getElementById('periodDuration');
+                
+                if (startElement && endElement && durationElement) {
+                    const startDate = new Date(startElement.value);
+                    const endDate = new Date(endElement.value);
+                    
+                    if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                        const diffTime = Math.abs(endDate - startDate);
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        
+                        durationElement.textContent = `(${diffDays} Hari)`;
+                        console.log(`Updated duration to: ${diffDays} days`);
+                    }
+                }
+            }
+            
+            // Set up date event listeners
+            const startInput = document.getElementById('periodStart');
+            const endInput = document.getElementById('periodEnd');
+            
+            if (startInput && endInput) {
+                startInput.addEventListener('change', function() {
+                    calculatePeriodDays();
+                    updatePrintPeriod();
+                });
+                endInput.addEventListener('change', function() {
+                    calculatePeriodDays();
+                    updatePrintPeriod();
+                });
+                calculatePeriodDays();
+                updatePrintPeriod(); // Initialize print period on page load
+            }
+            
+            // Button functionality
+            const calculateBtn = document.getElementById('calculateBill');
+            const saveBtn = document.getElementById('saveBill');
+            const printBtn = document.getElementById('printBill');
+            const clearBtn = document.getElementById('clearBill');
+            
+            // Calculate button is handled by ElectricityBillCalculator class
+            
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function() {
+                    console.log('Save button clicked');
+                    alert('Bil berjaya disimpan!');
+                });
+            }
+            
+            // Print button handled by ElectricityBillCalculator class
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    console.log('Clear button clicked');
+                    if (confirm('Adakah anda pasti mahu mengosongkan semua data?')) {
+                        clearAllFields();
+                    }
+                });
+            }
+            
+            // Removed duplicate calculateBill function - using ElectricityBillCalculator class instead
+            
+            function updateChargesTable(charges) {
+                const elements = {
+                    peakEnergyAmount: document.getElementById('peakEnergyAmount'),
+                    offPeakEnergyAmount: document.getElementById('offPeakEnergyAmount'),
+                    capacityAmount: document.getElementById('capacityAmount'),
+                    networkAmount: document.getElementById('networkAmount'),
+                    retailAmount: document.getElementById('retailAmount'),
+                    currentMonthCharge: document.getElementById('currentMonthCharge'),
+                    kwtbbAmount: document.getElementById('kwtbbAmount'),
+                    grandTotal: document.getElementById('grandTotal')
+                };
+                
+                Object.keys(elements).forEach(key => {
+                    if (elements[key]) {
+                        elements[key].textContent = charges[key].toFixed(2);
+                    }
+                });
+            }
+            
+            function clearAllFields() {
+                const fields = ['peakUsage', 'offPeakUsage', 'maxDemand', 'totalUsage'];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.value = '';
+                });
+                
+                // Reset calculations
+                updateChargesTable({
+                    peakEnergyAmount: 0,
+                    offPeakEnergyAmount: 0,
+                    capacityAmount: 0,
+                    networkAmount: 0,
+                    retailAmount: 0,
+                    currentMonthCharge: 0,
+                    kwtbbAmount: 0,
+                    grandTotal: 0
+                });
+                
+                console.log('All fields cleared');
+            }
+            
+            function updatePrintPeriod() {
+                const startDate = document.getElementById('periodStart').value;
+                const endDate = document.getElementById('periodEnd').value;
+                const durationText = document.getElementById('periodDuration').textContent;
+                const accountNumber = document.getElementById('accountNumber').value;
+                
+                // Update the print period display - target the correct element
+                const printPeriodElement = document.getElementById('paymentPeriod');
+                if (printPeriodElement && startDate && endDate) {
+                    // Format dates for display (DD.MM.YYYY format to match original)
+                    const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                    const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
+                    printPeriodElement.textContent = `NO. AKAUN: ${accountNumber}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
+                    console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
+                }
+            }
+            
+            console.log('All button event listeners added successfully');
+        });
+    </script>
+</body>
+</html>
