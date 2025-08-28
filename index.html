@@ -140,7 +140,7 @@
                     <div class="print-info-row">
                         <div class="print-info-item">
                             <strong>NAMA PENYEWA:</strong>
-                            <span id="printAccountNumber"></span>
+                            <span id="printTenantName"></span>
                         </div>
                         <div class="print-info-item">
                             <strong>TEMPOH BIL:</strong>
@@ -401,6 +401,7 @@
                 const endDate = document.getElementById('periodEnd').value;
                 const durationText = document.getElementById('periodDuration').textContent;
                 const tenantName = document.getElementById('tenantName').value;
+                const accountNumber = document.getElementById('accountNumber').value;
                 
                 // Update the print period display - target the correct element
                 const printPeriodElement = document.getElementById('paymentPeriod');
@@ -409,13 +410,26 @@
                         // Format dates for display (DD.MM.YYYY format to match user requirement)
                         const startFormatted = new Date(startDate).toLocaleDateString('en-GB').replace(/\//g, '.');
                         const endFormatted = new Date(endDate).toLocaleDateString('en-GB').replace(/\//g, '.');
-                        printPeriodElement.textContent = `NAMA PENYEWA: ${tenantName || 'Belum diisi'}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
+                        printPeriodElement.value = `NO. AKAUN: ${accountNumber || 'Belum diisi'}\nTEMPOH BIL: ${startFormatted} - ${endFormatted} ${durationText}`;
                         console.log('Print period updated:', `${startFormatted} - ${endFormatted} ${durationText}`);
                     } else {
                         // No dates selected yet
-                        printPeriodElement.textContent = `NAMA PENYEWA: ${tenantName || 'Belum diisi'}\nTEMPOH BIL: Belum dipilih`;
+                        printPeriodElement.value = `NO. AKAUN: ${accountNumber || 'Belum diisi'}\nTEMPOH BIL: Belum dipilih`;
                         console.log('Print period updated: No dates selected yet');
                     }
+                }
+                
+                // Also update the print-only sections
+                const printTenantNameElement = document.getElementById('printTenantName');
+                const printPremiseAddressElement = document.getElementById('printPremiseAddress');
+                
+                if (printTenantNameElement) {
+                    printTenantNameElement.textContent = tenantName || 'Belum diisi';
+                }
+                
+                if (printPremiseAddressElement) {
+                    const premiseAddress = document.getElementById('premiseAddress').value;
+                    printPremiseAddressElement.textContent = premiseAddress || 'Belum diisi';
                 }
             }
             
