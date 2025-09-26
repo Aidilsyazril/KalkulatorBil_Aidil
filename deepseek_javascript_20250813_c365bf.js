@@ -15,7 +15,6 @@ class ElectricityBillCalculator {
         console.log('Initializing event listeners...');
         this.initializeEventListeners();
         this.initializeDateListeners();
-        this.updateAfaRateDisplay(); // Initialize AFA display
         this.calculateBill(); // Calculate on initial load
         console.log('Constructor completed');
     }
@@ -80,38 +79,113 @@ class ElectricityBillCalculator {
         document.getElementById('offPeakUsage').addEventListener('input', () => this.calculateBill());
         document.getElementById('maxDemand').addEventListener('input', () => this.calculateBill());
         document.getElementById('totalUsage').addEventListener('input', () => this.calculateBill());
-        
-        // AFA rate selection
-        document.getElementById('afaRate').addEventListener('change', () => {
-            this.updateAfaRateDisplay();
-            this.calculateBill();
-        });
-
-        // Manual buttons
-        document.getElementById('calculateBill').addEventListener('click', () => this.calculateBill());
-        document.getElementById('printBill').addEventListener('click', () => this.printBill());
-        
+        document.getElementById('afaRate').addEventListener('input', () => this.calculateBill());
+        const calculateBtn = document.getElementById('calculateBill');
+        const printBtn = document.getElementById('printBill');
         const clearButton = document.getElementById('clearBill');
+        
+        // Create new elements to replace existing ones and clear event listeners
+        if (calculateBtn) {
+            const newCalculateBtn = calculateBtn.cloneNode(true);
+            calculateBtn.parentNode.replaceChild(newCalculateBtn, calculateBtn);
+            newCalculateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Calculate button clicked');
+                this.calculateBill();
+                // Save the bill after calculation
+                this.saveBillToStorage(this.getBillData());
+            }, { once: true });
+        }
+        
+        if (printBtn) {
+            const newPrintBtn = printBtn.cloneNode(true);
+            printBtn.parentNode.replaceChild(newPrintBtn, printBtn);
+            newPrintBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Print button clicked');
+                this.printBill();
+            });
+        }
+        
         if (clearButton) {
-            clearButton.addEventListener('click', () => {
+            const newClearBtn = clearButton.cloneNode(true);
+            clearButton.parentNode.replaceChild(newClearBtn, clearButton);
+            newClearBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('Clear button clicked');
                 this.clearBill();
+                // Clear saved form data when manually cleared
+                sessionStorage.removeItem('calculatorFormData');
             });
-            console.log('Clear button event listener attached');
-        } else {
-            console.log('Clear button not found');
         }
+        
+        console.log('All button event listeners added successfully');
+    }
+
+    getBillData() {
+        const peakUsage = parseFloat(document.getElementById('peakUsage').value) || 0;
+        const offPeakUsage = parseFloat(document.getElementById('offPeakUsage').value) || 0;
+        const totalUsage = parseFloat(document.getElementById('totalUsage').value) || 0;
+        const maxDemand = parseFloat(document.getElementById('maxDemand').value) || 0;
+        
+        // Calculate total amount if available
+        let totalAmount = 0;
+        const grandTotalElement = document.getElementById('grandTotal');
+        if (grandTotalElement) {
+            const totalText = grandTotalElement.textContent || grandTotalElement.innerText;
+            const match = totalText.match(/[\d.,]+/);
+            if (match) {
+                totalAmount = parseFloat(match[0].replace(/,/g, ''));
+            }
+        }
+        
+        return {
+            tenantName: document.getElementById('tenantName').value,
+            premiseAddress: document.getElementById('premiseAddress').value,
+            billDate: document.getElementById('billDate').value,
+            paymentPeriod: document.querySelector('.period-details')?.textContent?.trim() || '',
+            periodStart: document.getElementById('periodStart').value,
+            periodEnd: document.getElementById('periodEnd').value,
+            accountNumber: document.getElementById('accountNumber').value,
+            meterNumber: document.getElementById('meterNumber').value,
+            peakUsage,
+            offPeakUsage,
+            totalUsage,
+            maxDemand,
+            totalAmount: totalAmount || 0,
+            timestamp: new Date().toISOString()
+        };
     }
 
     calculateBill() {
-        const peakUsage = parseFloat(document.getElementById('peakUsage').value) || 0;
-        const offPeakUsage = parseFloat(document.getElementById('offPeakUsage').value) || 0;
-        const maxDemand = parseFloat(document.getElementById('maxDemand').value) || 0;
-        const totalUsage = parseFloat(document.getElementById('totalUsage').value) || 0;
+        try {
+            console.log('Calculating bill...');
+            
+            // Get input values
+            const peakUsage = parseFloat(document.getElementById('peakUsage').value) || 0;
+            const offPeakUsage = parseFloat(document.getElementById('offPeakUsage').value) || 0;
+            const maxDemand = parseFloat(document.getElementById('maxDemand').value) || 0;
+            const totalUsage = parseFloat(document.getElementById('totalUsage').value) || 0;
 
-        this.updateDisplayValues(peakUsage, offPeakUsage, totalUsage, maxDemand);
-        const calculations = this.calculateCharges(peakUsage, offPeakUsage, totalUsage, maxDemand);
-        this.updateChargesTable(calculations);
+            this.updateDisplayValues(peakUsage, offPeakUsage, totalUsage, maxDemand);
+            const calculations = this.calculateCharges(peakUsage, offPeakUsage, totalUsage, maxDemand);
+            this.updateChargesTable(calculations);
+            
+            // Update the total amount in the bill
+            const totalAmountElement = document.getElementById('grandTotal');
+            const totalAmount = calculations.grandTotal;
+            totalAmountElement.innerHTML = `<strong>${totalAmount.toFixed(2)}</strong>`;
+            
+            // Add total to bill data and save
+            const billData = this.getBillData();
+            billData.totalAmount = totalAmount.toFixed(2);
+            this.saveBillToStorage(billData);
+        } catch (error) {
+            console.error('Error calculating bill:', error);
+        }
     }
 
     updateDisplayValues(peakUsage, offPeakUsage, totalUsage, maxDemand) {
@@ -128,7 +202,7 @@ class ElectricityBillCalculator {
     }
 
     calculateCharges(peakUsage, offPeakUsage, totalUsage, maxDemand) {
-        // Get AFA rate from dropdown
+        // Get AFA rate from input
         const afaRate = parseFloat(document.getElementById('afaRate').value) || 0;
         
         const peakEnergyAmount = peakUsage * this.rates.peakEnergy;
@@ -138,14 +212,21 @@ class ElectricityBillCalculator {
         const networkAmount = maxDemand * this.rates.network;
         const retailAmount = this.rates.retail;
         
-        // Calculate rebate only on base charges (excluding AFA)
-        const baseCharges = peakEnergyAmount + offPeakEnergyAmount + capacityAmount + networkAmount + retailAmount;
-        const rebateAmount = baseCharges * this.rates.rebate;
-        const chargesAfterRebate = baseCharges - rebateAmount;
+        // Calculate base charges (excluding AFA for rebate calculation)
+        const baseChargesForRebate = peakEnergyAmount + offPeakEnergyAmount + capacityAmount + networkAmount;
+        const rebateAmount = baseChargesForRebate * this.rates.rebate;
         
-        // Add AFA after rebate calculation
-        const currentMonthCharge = chargesAfterRebate + afaAmount;
-        const kwtbbAmount = currentMonthCharge * this.rates.kwtbb;
+        // Calculate current month charge: base charges - rebate + AFA + retail
+        const currentMonthCharge = baseChargesForRebate - rebateAmount + afaAmount + retailAmount;
+        
+        // KWTBB calculation according to the formula:
+        // KWTBB = (RM KWH Peak + RM KWH Off Peak + RM Kapasiti + RM Rangkaian - RM TNB Diskaun) x 1.6%
+        // Where RM TNB Diskaun = (RM KWH Peak + RM KWH Off Peak + RM Kapasiti + RM Rangkaian) x 10%
+        const baseForKwtbb = peakEnergyAmount + offPeakEnergyAmount + capacityAmount + networkAmount;
+        const tnbDiscount = baseForKwtbb * this.rates.rebate; // 10% rebate (subtracted, not added)
+        const kwtbbBase = baseForKwtbb - tnbDiscount; // Subtract the discount
+        const kwtbbAmount = kwtbbBase * this.rates.kwtbb;
+        
         const subtotalBeforeRounding = currentMonthCharge + kwtbbAmount;
         
         // Calculate rounding adjustment
@@ -320,14 +401,6 @@ class ElectricityBillCalculator {
         }
     }
 
-    updateAfaRateDisplay() {
-        const afaRate = document.getElementById('afaRate').value;
-        const afaRateDisplay = document.getElementById('afaRateDisplay');
-        if (afaRateDisplay) {
-            afaRateDisplay.textContent = afaRate;
-        }
-        console.log('AFA rate updated to:', afaRate);
-    }
 
     clearBill() {
         console.log('clearBill function called');
@@ -365,6 +438,67 @@ class ElectricityBillCalculator {
             console.log('Bill cleared successfully');
         } else {
             console.log('User cancelled clear operation');
+        }
+    }
+    
+    saveBillToStorage(billData) {
+        try {
+            console.log('Saving bill data:', billData);
+            
+            // Generate a unique ID if not exists
+            if (!billData.id) {
+                billData.id = 'bill-' + Date.now();
+            }
+            
+            // Get existing bills or initialize empty array
+            let bills = [];
+            const savedBills = localStorage.getItem('electricityBills');
+            if (savedBills) {
+                try {
+                    bills = JSON.parse(savedBills);
+                    // Ensure it's an array
+                    if (!Array.isArray(bills)) {
+                        console.warn('Existing bills data is not an array, initializing new array');
+                        bills = [];
+                    }
+                } catch (e) {
+                    console.error('Error parsing saved bills:', e);
+                    bills = [];
+                }
+            }
+            
+            // Check if bill with same ID exists and update it, otherwise add new
+            const existingIndex = bills.findIndex(bill => bill.id === billData.id);
+            if (existingIndex >= 0) {
+                bills[existingIndex] = billData;
+                console.log('Updated existing bill with ID:', billData.id);
+            } else {
+                bills.push(billData);
+                console.log('Added new bill with ID:', billData.id);
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('electricityBills', JSON.stringify(bills));
+            console.log('Successfully saved', bills.length, 'bills to localStorage');
+            
+            // Dispatch a custom event to notify other components (like tenant list) of the update
+            try {
+                const event = new CustomEvent('billSaved', { 
+                    detail: { 
+                        bill: billData,
+                        timestamp: new Date().toISOString()
+                    } 
+                });
+                console.log('Dispatching billSaved event');
+                window.dispatchEvent(event);
+            } catch (e) {
+                console.error('Error dispatching event:', e);
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Error in saveBillToStorage:', error);
+            return false;
         }
     }
 }
